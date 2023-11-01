@@ -54,13 +54,23 @@ Estan en css
 
 ## Modelo de Dominio
 ### Diagrama de Actividad
-![Crear Rutina](./model/DiagramaCrearRutina.pdf)
+![CrearRutina](./model/Crear%20Rutina.pdf)
 
 Este diagrama lo que muestra es el proceso por el cual se efectua la creacion de cada rutina. En la que se detalla, paso a paso, los diferentes acciones que el sistema ha de realizar modelando asi la activadad.
-### Requisitos Funcionales
-### Requisitos de Informacion
-### Reglas de Negocio
+
+Descripcion de la actividad [CrearRutina]:
+<br>Lo primero que hacer el usuario cuando crea la rutina es seleccionar los dias de la semana que quiere entrenar.Ademas se le sugiere la Push-Pul-Leg, la Arnold, la combinación, etc.<br>
+Una vez seleccionados los dias/estructura a seguir se va dia a dia para seleccionar los ejercicios que se quieren.<br>
+Si no ha seleccionado ninguna estructura de entrenamiento lo primero será selecionar el/los grupo(s) muscular(es) que quiera entrenar ese dia. Si si que seleccionado una estructura de entrenamiento, este paso sera automatico.<br>
+Una vez con el grupo muscular toca seleccionar los ejercicios a realizar con sus caracteristicas. Para ello cuenta con una lista y una serie de filtros con los que poder moverse para encontrar el ejercicio que quiere realizar.<br>
+Con el ejercicio ya seleccionado tocaria especificar el numero de series y repeticiones (aunque salgan una predeterminadas por cada ejercicio). Y especificar el rir. Una vez guarda la rutina, simplemente habria que ejecutarla cada dia.
+
+### Modelado Requisitos
+![ModeloRequisitos](./model//Modelo%20de%20Requisitos.xlsx)
+
 ### Diagrama de Casos de Uso
+
 ### Diagrama de Clases
+
 
 ## Diagrama Entidad-Relacion
