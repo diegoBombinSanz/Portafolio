@@ -17,6 +17,8 @@ Siempre suele ocurrir que el gimnasio está lleno y el ejercicio que nos toca no
 |Filtro para <br>elegir ejercicio|Borrar Rutina|Establecer RIR|
 |Plantillas predefinidas<br>rutina|Añadir Ejercicio|Solicitar variantes|
 |Visualizacion progreso|Borrar Ejercicio|Listado ejercicios|
+|ajustes de tamaño<br> de letra|cambiar modo oscuro|estadisticas|
+|ayuda y <br>soporte|ir hacia atras de pantallas||
 
 ## Gama de colores Aplicacion
 
