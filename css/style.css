@@ -26,7 +26,7 @@ body{
 }
 
 .home_container .home_info{
-    padding-bottom: 3rem;
+    padding-bottom: 5rem;
     display: flex;
     flex-direction: column;
     align-items:  start;
@@ -70,7 +70,6 @@ body{
 }
 
 footer{
-    background-color: aquamarine;
     color: white;
     display: flex;
     flex-direction: column;
@@ -82,10 +81,83 @@ footer{
 footer .enlaces{
     display: flex;
     justify-content: space-around;
+    width: 100%;
+    border-top: 1px solid white;
+    padding-top: 2rem;
 }
 
 footer a{
     text-decoration: none;
     color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
+
+.divisor_1{
+    background-color: white;
+    border-top-left-radius: 90%;
+    border-top-right-radius: 90%;
+    width: 100%;
+    height: 8rem;
+    margin-top: -4rem;
+    position: relative;
+}
+
+.aboutMe_container{
+    height: 100%;
+    background-color: white;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+}
+
+.aboutMe_container img{
+    width: 100%;
+    height: 100%;
+    border-radius: 20%;
+}
+
+.aboutMe_container .about_inf{
+    padding: 0.5rem;
+}
+
+.aboutMe_container .about_inf h3{
+    font-size: 24pt;
+}
+
+.skills_container{
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding: 1rem;
+}
+
+.skills_container .lenguajes_container{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.skills_container .lenguajes_container .elem{
+    background-color: orange;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    transition: opacity 0.6s ease;
+    border-radius: 11px;
+    padding: 1rem;
+}
+
+.skills_container .lenguajes_container:hover >:not(:hover){
+    opacity: 0.4;
+}
+
 
