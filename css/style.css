@@ -9,7 +9,7 @@ body{
     background-color: black;
     padding: 0px 0px 0px 1rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     height: 100vh;
     overflow: hidden;
 }
@@ -17,6 +17,8 @@ body{
 .home_container .image {
     background-image: linear-gradient(to left, rgba(255,255,255,0), rgba(0,0,0,1)), url('../public/Foto.JPG');
     background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .home_container img{
@@ -51,6 +53,7 @@ body{
 }
 
 .header_container .header_right{
+    text-decoration: none;
     color: white;
     cursor: pointer;
 }
@@ -78,11 +81,13 @@ footer{
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 1rem;
     padding-bottom: 2rem;
 }
 
 footer .enlaces{
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     justify-content: space-around;
     width: 100%;
     border-top: 1px solid white;
@@ -174,4 +179,32 @@ footer a{
     text-align: center;
 }
 
+@media screen and (max-width: 640px) {
+    .home_container{
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .home_container .image {
+        display: none;
+    }
+    .home_container .home_info{
+        background-image: linear-gradient(to left, rgba(255,255,255,0), rgba(0,0,0,1)), url('../public/Foto.JPG');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
 
+    .aboutMe_container{
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .skills_container .lenguajes_container{
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    footer .enlaces{
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header_container .header_left{
+        display: none;
+    }
+ }
