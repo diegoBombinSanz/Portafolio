@@ -6,12 +6,11 @@ body{
 }
 
 .home_container{
-    margin-top: -20px;
     background-color: black;
     padding: 0px 0px 0px 1rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    height: 80vh;
+    height: 100vh;
     overflow: hidden;
 }
 
@@ -40,6 +39,10 @@ body{
 }
 
 .header_container{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     padding: 1rem;
     display: grid;
     grid-template-columns: 1fr 3fr;
@@ -147,6 +150,7 @@ footer a{
 .skills_container .lenguajes_container .elem{
     background-color: orange;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-decoration: none;
@@ -158,6 +162,16 @@ footer a{
 
 .skills_container .lenguajes_container:hover >:not(:hover){
     opacity: 0.4;
+}
+
+.elem img{
+    width: 100px;
+    height: 100px;
+}
+
+.elem #info, h3{
+    cursor: pointer;
+    text-align: center;
 }
 
 

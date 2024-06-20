@@ -5,9 +5,21 @@
     <title>Diego Bombin Sanz</title>
     <link rel="shortcut icon" href="./public/books.svg" type="image/x-icon">
     <link rel="stylesheet" href="./css/style.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
+
   </head> 
-  <body>
-    <iframe id="header" src="./header.htm" frameborder="0" width="100%" height="10%"></iframe>
+  <body id="cont">
+    <div class="header_container">
+      <div class="header_right">
+          <h3>Portfolio</h3>
+      </div>
+      <div class="header_left">
+          <a href="#">Home</a>
+          <a href="#aboutme">About me</a>
+          <a href="#skills">Skills</a>
+          <a href="#contact">Contact</a>
+      </div>
+  </div>
     <div class="home_container">
       <div class="home_info">
         <p>MY NAME IS</p>
@@ -25,7 +37,7 @@
     <div class="divisor_1">
       <span>f</span>
     </div>
-    <div class="aboutMe_container">
+    <div id="aboutme" class="aboutMe_container">
       <div class="img_container">
         <img src="./public/Foto.JPG" alt="Diego">
       </div>
@@ -45,21 +57,86 @@
       </div>
     </div>
     
-    <div class="skills_container">
+    <div id="skills" class="skills_container">
       <h2>SKILLS</h2>
       <div class="lenguajes_container">
-          <a class="elem" href="#">Java</a>
-          <a class="elem" href="#">Python</a>
-          <a class="elem" href="#">C++</a>
-          <a class="elem" href="#">UML</a>
+          <div class="elem">
+            <img src="./public/java.png" alt="java">
+            <div class="elem_subcontainer">
+              <h3>Java</h3>
+              <p id="info">+info</p>
+              <div class="elem_oculto">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui dicta similique ex ipsa sed! Vero omnis nostrum minima illum inventore expedita maiores? Dolorem eveniet, culpa omnis corrupti quisquam illo nihil?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="elem">
+            <img src="./public/html.png" alt="html">
+            <div class="elem_subcontainer">
+              <h3>HTML-CSS-JS</h3>
+              <p id="info">+info</p>
+              <div class="elem_oculto">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui dicta similique ex ipsa sed! Vero omnis nostrum minima illum inventore expedita maiores? Dolorem eveniet, culpa omnis corrupti quisquam illo nihil?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="elem">
+            <img src="./public/python.png" alt="python">
+            <div class="elem_subcontainer">
+              <h3>Python</h3>
+              <p id="info">+info</p>
+              <div class="elem_oculto">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui dicta similique ex ipsa sed! Vero omnis nostrum minima illum inventore expedita maiores? Dolorem eveniet, culpa omnis corrupti quisquam illo nihil?</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="elem">
+            <div class="elem_subcontainer">
+              <h3>UML</h3>
+              <p id="info">+info</p>
+              <div class="elem_oculto">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Qui dicta similique ex ipsa sed! Vero omnis nostrum minima illum inventore expedita maiores? Dolorem eveniet, culpa omnis corrupti quisquam illo nihil?</p>
+              </div>
+            </div>
+          </div>
       </div>
   </div>
-    <footer>
+    <footer id="contact">
       <h3>Thanks</h3>
       <div class="enlaces">
         <a href="mailto:diesanz2003@gmail.com?Subject=Quiero contactar contigo">Enviar Email<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="#ffffff"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-send"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 14l11 -11" /><path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" /></svg></a>
         <a href="tel:+34636208104">Llama<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="#ffffff"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-phone"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" /></svg></a>
+        <a href="http://">LinkedIn<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M8 11l0 5" /><path d="M8 8l0 .01" /><path d="M12 16l0 -5" /><path d="M16 16v-3a2 2 0 0 0 -4 0" /></svg></a>
+        <a href="">Descargar CV<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg></a>
       </div>
     </footer>
   </body>
 </html>
+
+<script>
+  $(function(){
+    $('.elem_oculto').hide();
+    $('.elem #info').click(function(){
+      $(this).closest('.elem').find('.elem_oculto').toggle('slow'); // Muestra/oculta el .elem_oculto dentro del .elem más cercano
+    });
+  });
+
+  var lastScrollTop = 0;
+$(window).scroll(function() {
+    var scrollTop = $(window).scrollTop();
+    var header = $('.header_container');
+    if (scrollTop < lastScrollTop) {
+        // El scroll ha subido
+        console.log('Scroll up');
+        header.show().css('background-color', 'rgba(0, 0, 0, 0.7)');
+    } else if (scrollTop > lastScrollTop) {
+        // El scroll ha bajado
+        console.log('Scroll down');
+        header.hide();
+    }
+    lastScrollTop = scrollTop;
+});
+</script>
