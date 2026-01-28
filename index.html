@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guía Comer Bagnolet</title>
+<title>Guía Comer – Bagnolet</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1f2a44">
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 :root {
@@ -49,6 +52,11 @@ button {
     background: var(--accent);
     color: white;
 }
+#map {
+    height: 280px;
+    margin: 10px;
+    border-radius: 12px;
+}
 .card {
     background: var(--card);
     margin: 10px;
@@ -65,12 +73,7 @@ button {
     text-decoration: none;
     margin-top: 10px;
 }
-iframe {
-    width: 100%;
-    height: 280px;
-    border: none;
-    border-radius: 12px;
-}
+.small { font-size: 0.85em; opacity: .8; }
 </style>
 </head>
 
@@ -78,7 +81,7 @@ iframe {
 
 <header>
     <h2>🍽️ Guía Comer – Bagnolet</h2>
-    <p>Instalable · Offline · A pie</p>
+    <p id="gpsStatus">📍 Localizando…</p>
 </header>
 
 <div class="controls">
@@ -93,38 +96,81 @@ iframe {
         <option value="10">⏱️ Hasta 10 min</option>
     </select>
 
-    <button onclick="toggleNight()">🌙 Noche</button>
+    <button onclick="toggleNight()">🌙</button>
 </div>
 
+<div id="map"></div>
 <div id="lista"></div>
 
-<iframe src="https://www.google.com/maps?q=Hotel+Campanile+Paris+Est+Porte+de+Bagnolet&output=embed"></iframe>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const sitios = [
- {nombre:"Spicy Chick", tipo:"comida", min:10, url:"https://www.google.com/maps/dir/?api=1&origin=Hotel+Campanile+Bagnolet&destination=Spicy+Chick+Bagnolet&travelmode=walking"},
- {nombre:"Mayda Kebab", tipo:"comida", min:10, url:"https://www.google.com/maps/dir/?api=1&origin=Hotel+Campanile+Bagnolet&destination=Mayda+Kebab+Bagnolet&travelmode=walking"},
- {nombre:"Fraté Italian Kitchen", tipo:"cena", min:20, url:"https://www.google.com/maps/dir/?api=1&origin=Hotel+Campanile+Bagnolet&destination=Fraté+Italian+Kitchen&travelmode=walking"},
- {nombre:"O’Bois Pizza", tipo:"cena", min:20, url:"https://www.google.com/maps/dir/?api=1&origin=Hotel+Campanile+Bagnolet&destination=O'Bois+Pizza&travelmode=walking"},
- {nombre:"Chez Laxmi", tipo:"cena", min:15, url:"https://www.google.com/maps/dir/?api=1&origin=Hotel+Campanile+Bagnolet&destination=Chez+Laxmi&travelmode=walking"},
- {nombre:"Voyage du Palais", tipo:"cena", min:25, url:"https://www.google.com/maps/dir/?api=1&origin=Hotel+Campanile+Bagnolet&destination=Voyage+du+Palais&travelmode=walking"}
+const lugares = [
+ {nombre:"Spicy Chick", tipo:"comida", lat:48.8672, lon:2.4150},
+ {nombre:"Mayda Kebab", tipo:"comida", lat:48.8665, lon:2.4180},
+ {nombre:"Fraté Italian Kitchen", tipo:"cena", lat:48.8680, lon:2.4123},
+ {nombre:"O’Bois Pizza", tipo:"cena", lat:48.8635, lon:2.4171},
+ {nombre:"Chez Laxmi", tipo:"cena", lat:48.8629, lon:2.4215},
+ {nombre:"Voyage du Palais", tipo:"cena", lat:48.8641, lon:2.4137}
 ];
+
+let map, userMarker;
+let userLat, userLon;
+let markers = [];
+
+function initMap(lat, lon) {
+    map = L.map('map').setView([lat, lon], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    userMarker = L.marker([lat, lon])
+        .addTo(map)
+        .bindPopup("📍 Estás aquí")
+        .openPopup();
+
+    render();
+}
+
+function distancia(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+    const a =
+      Math.sin(dLat/2)**2 +
+      Math.cos(lat1*Math.PI/180) *
+      Math.cos(lat2*Math.PI/180) *
+      Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 
 function render() {
     const tipo = tipoSel.value;
-    const dist = distSel.value;
+    const max = distanciaSel.value;
     lista.innerHTML = "";
 
-    sitios.filter(s =>
-        (tipo === "all" || s.tipo === tipo) &&
-        s.min <= dist
-    ).forEach(s => {
-        lista.innerHTML += `
-        <div class="card">
-            <h3>${s.nombre}</h3>
-            <p>⏱ ${s.min} min · ${s.tipo}</p>
-            <a class="btn" href="${s.url}" target="_blank">🚶‍♂️ Ir caminando</a>
-        </div>`;
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    lugares.forEach(l => {
+        const d = distancia(userLat, userLon, l.lat, l.lon);
+
+        if ((tipo === "all" || l.tipo === tipo) && d*60 <= max) {
+            const m = L.marker([l.lat, l.lon])
+                .addTo(map)
+                .bindPopup(`${l.nombre}<br>🚶 ${d.toFixed(2)} km`);
+
+            markers.push(m);
+
+            lista.innerHTML += `
+            <div class="card">
+                <h3>${l.nombre}</h3>
+                <p class="small">🚶 ${d.toFixed(2)} km</p>
+                <a class="btn"
+                   href="https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${l.lat},${l.lon}&travelmode=walking"
+                   target="_blank">Ir caminando</a>
+            </div>`;
+        }
     });
 }
 
@@ -133,13 +179,20 @@ function toggleNight() {
 }
 
 const tipoSel = document.getElementById("tipo");
-const distSel = document.getElementById("distancia");
+const distanciaSel = document.getElementById("distancia");
 const lista = document.getElementById("lista");
 
 tipoSel.onchange = render;
-distSel.onchange = render;
+distanciaSel.onchange = render;
 
-render();
+navigator.geolocation.getCurrentPosition(pos => {
+    userLat = pos.coords.latitude;
+    userLon = pos.coords.longitude;
+    document.getElementById("gpsStatus").textContent = "📍 Ubicación detectada";
+    initMap(userLat, userLon);
+}, () => {
+    document.getElementById("gpsStatus").textContent = "⚠️ No se pudo obtener GPS";
+});
 
 // PWA
 if ("serviceWorker" in navigator) {
