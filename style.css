@@ -167,3 +167,23 @@ input, textarea, select {
     cursor: pointer;
     font-size: 1em;
 }
+
+.sugerencias {
+    background: var(--card);
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    border-radius: 6px;
+    margin-top: 2px;
+}
+
+.sugerencias div {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.sugerencias div:hover {
+    background: var(--accent);
+    color: white;
+}
+
