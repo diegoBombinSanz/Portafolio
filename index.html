@@ -91,9 +91,11 @@ button {
     </select>
 
     <select id="distancia">
-        <option value="25">🚶 Hasta 25 min</option>
-        <option value="10">⏱️ Hasta 10 min</option>
-    </select>
+    <option value="all">🌐 Mostrar todos</option>
+    <option value="25">🚶 Hasta 25 min</option>
+    <option value="10">⏱️ Hasta 10 min</option>
+</select>
+
 
     <button onclick="obtenerGPS()">📍 Recalcular</button>
     <button onclick="toggleNight()">🌙</button>
@@ -161,33 +163,56 @@ function obtenerGPS() {
 
 function render() {
     const tipo = tipoSel.value;
-    const max = distanciaSel.value;
+    const distValue = distanciaSel.value; // 10, 25 o "all"
     lista.innerHTML = "";
 
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
     lugares.forEach(l => {
-        const d = distancia(userLat, userLon, l.lat, l.lon);
+        let mostrar = false;
+        let minutos = null;
 
-        if ((tipo === "all" || l.tipo === tipo) && d * 60 <= max) {
-            const m = L.marker([l.lat, l.lon])
-                .addTo(map)
-                .bindPopup(`${l.nombre}<br>🚶 ${d.toFixed(2)} km`);
+        // Si tenemos ubicación y no es "all"
+        if (userLat && userLon && distValue !== "all") {
+            const km = distancia(userLat, userLon, l.lat, l.lon);
+            minutos = km * 12; // tiempo caminando
+            mostrar = minutos <= Number(distValue);
+        } else {
+            // Siempre mostrar si no hay GPS o dist = "all"
+            mostrar = true;
+        }
 
-            markers.push(m);
+        // Filtrar por tipo
+        if (mostrar && (tipo === "all" || l.tipo === tipo)) {
+
+            // Añadir marcador al mapa si GPS disponible
+            if (map) {
+                const m = L.marker([l.lat, l.lon])
+                    .addTo(map)
+                    .bindPopup(`${l.nombre}${minutos ? "<br>🚶 " + minutos.toFixed(0) + " min" : ""}`);
+                markers.push(m);
+            }
 
             lista.innerHTML += `
             <div class="card">
                 <h3>${l.nombre}</h3>
-                <p class="small">🚶 ${d.toFixed(2)} km</p>
+                <p class="small">${minutos ? "🚶 " + minutos.toFixed(0) + " min caminando" : "📍 Distancia no disponible"}</p>
                 <a class="btn"
-                   href="https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${l.lat},${l.lon}&travelmode=walking"
+                   href="https://www.google.com/maps/dir/?api=1&origin=${userLat || ""},${userLon || ""}&destination=${l.lat},${l.lon}&travelmode=walking"
                    target="_blank">Ir caminando</a>
             </div>`;
         }
     });
+
+    if (lista.innerHTML === "") {
+        lista.innerHTML = `
+            <div class="card">
+                <p>😕 No hay sitios para mostrar.</p>
+            </div>`;
+    }
 }
+
 
 function toggleNight() {
     document.body.classList.toggle("night");
