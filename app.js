@@ -96,3 +96,42 @@ function guardarLugar(){
     cerrarFormulario();
     render();
 }
+
+const inputBuscador = document.getElementById("buscadorLugar");
+const sugerenciasDiv = document.getElementById("sugerencias");
+const coordenadasInput = document.getElementById("coordenadas");
+const coordsText = document.getElementById("coordenadasSeleccionadas");
+
+let timeout = null;
+
+inputBuscador.addEventListener("input", () => {
+    const query = inputBuscador.value.trim();
+    if (query.length < 3) {
+        sugerenciasDiv.innerHTML = "";
+        return;
+    }
+    
+    // Limitar la frecuencia de consultas
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+            sugerenciasDiv.innerHTML = "";
+            data.forEach(place => {
+                const div = document.createElement("div");
+                div.textContent = place.display_name;
+                div.addEventListener("click", () => {
+                    const lat = parseFloat(place.lat).toFixed(6);
+                    const lon = parseFloat(place.lon).toFixed(6);
+                    coordsText.textContent = `Lat,Lon: ${lat},${lon}`;
+                    coordenadasInput.value = `${lat},${lon}`;
+                    sugerenciasDiv.innerHTML = "";
+                    inputBuscador.value = place.display_name;
+                });
+                sugerenciasDiv.appendChild(div);
+            });
+        });
+    }, 300); // Espera 300ms tras teclear
+});
+
