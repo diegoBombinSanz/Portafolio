@@ -7,74 +7,8 @@
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1f2a44">
-
-<!-- Leaflet CSS -->
+<link rel="stylesheet" href="style.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<style>
-:root {
-    --bg: #f2f2f2;
-    --card: #ffffff;
-    --text: #222;
-    --accent: #2ecc71;
-}
-body.night {
-    --bg: #121212;
-    --card: #1e1e1e;
-    --text: #f0f0f0;
-    --accent: #f39c12;
-}
-body {
-    margin: 0;
-    font-family: system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-}
-header {
-    background: #1f2a44;
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
-.controls {
-    display: flex;
-    gap: 8px;
-    padding: 10px;
-    flex-wrap: wrap;
-}
-select, button {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-}
-button {
-    background: var(--accent);
-    color: white;
-}
-#map {
-    height: 280px;
-    margin: 10px;
-    border-radius: 12px;
-}
-.card {
-    background: var(--card);
-    margin: 10px;
-    padding: 15px;
-    border-radius: 12px;
-}
-.btn {
-    display: block;
-    text-align: center;
-    background: var(--accent);
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    text-decoration: none;
-    margin-top: 10px;
-}
-.small { font-size: 0.85em; opacity: .8; }
-</style>
 </head>
 
 <body>
@@ -104,133 +38,30 @@ button {
 <div id="map"></div>
 <div id="lista"></div>
 
-<!-- Leaflet JS -->
+<footer>
+    <button onclick="mostrarFormulario()">➕ Añadir Lugar</button>
+</footer>
+
+<!-- Modal formulario -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarFormulario()">&times;</span>
+        <h3>Agregar lugar</h3>
+        <label>Nombre: <input type="text" id="nombreLugar"></label>
+        <label>Tipo: 
+            <select id="tipoLugar">
+                <option value="comida">Comida</option>
+                <option value="cena">Cena</option>
+            </select>
+        </label>
+        <label>Reseña:<br><textarea id="reseña" rows="3"></textarea></label>
+        <label>Ubicación (Google Maps): <input type="text" id="coordenadas" placeholder="lat,lon"></label>
+        <button onclick="guardarLugar()">Enviar</button>
+    </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const lugares = [
- {nombre:"Spicy Chick", tipo:"comida", lat:48.8672, lon:2.4150},
- {nombre:"Mayda Kebab", tipo:"comida", lat:48.8665, lon:2.4180},
- {nombre:"Fraté Italian Kitchen", tipo:"cena", lat:48.8680, lon:2.4123},
- {nombre:"O’Bois Pizza", tipo:"cena", lat:48.8635, lon:2.4171},
- {nombre:"Chez Laxmi", tipo:"cena", lat:48.8629, lon:2.4215},
- {nombre:"Voyage du Palais", tipo:"cena", lat:48.8641, lon:2.4137}
-];
-
-let map, userMarker;
-let userLat = null;
-let userLon = null;
-let markers = [];
-
-function toggleNight() {
-    document.body.classList.toggle("night");
-}
-
-function distancia(lat1, lon1, lat2, lon2) {
-    const R = 6371; // km
-    const dLat = (lat2-lat1) * Math.PI/180;
-    const dLon = (lon2-lon1) * Math.PI/180;
-    const a = Math.sin(dLat/2)**2 +
-              Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
-              Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-// Función para obtener GPS al pulsar
-function obtenerGPS() {
-    document.getElementById("gpsStatus").textContent = "📡 Localizando...";
-    
-    navigator.geolocation.getCurrentPosition(pos => {
-        userLat = pos.coords.latitude;
-        userLon = pos.coords.longitude;
-
-        document.getElementById("gpsStatus").textContent = "📍 Ubicación actualizada";
-
-        if (!map) {
-            map = L.map('map').setView([userLat, userLon], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-                .addTo(map);
-        } else {
-            map.setView([userLat, userLon], 15);
-        }
-
-        if (userMarker) map.removeLayer(userMarker);
-        userMarker = L.marker([userLat, userLon])
-            .addTo(map)
-            .bindPopup("📍 Estás aquí")
-            .openPopup();
-
-        render();
-    }, () => {
-        document.getElementById("gpsStatus").textContent = "⚠️ Activa la ubicación y pulsa Recalcular";
-        render(); // Aun asi mostramos lista completa
-    });
-}
-
-// Renderiza la lista de restaurantes
-function render() {
-    const tipo = tipoSel.value;
-    const distValue = distanciaSel.value; // 10, 25 o "all"
-    lista.innerHTML = "";
-
-    markers.forEach(m => map.removeLayer(m));
-    markers = [];
-
-    lugares.forEach(l => {
-        let mostrar = false;
-        let minutos = null;
-
-        if (userLat && userLon && distValue !== "all") {
-            const km = distancia(userLat, userLon, l.lat, l.lon);
-            minutos = km * 12; // tiempo caminando aprox
-            mostrar = minutos <= Number(distValue);
-        } else {
-            mostrar = true;
-        }
-
-        if (mostrar && (tipo === "all" || l.tipo === tipo)) {
-
-            if (map && userLat && userLon) {
-                const m = L.marker([l.lat, l.lon])
-                    .addTo(map)
-                    .bindPopup(`${l.nombre}${minutos ? "<br>🚶 " + minutos.toFixed(0) + " min" : ""}`);
-                markers.push(m);
-            }
-
-            lista.innerHTML += `
-            <div class="card">
-                <h3>${l.nombre}</h3>
-                <p class="small">${minutos ? "🚶 " + minutos.toFixed(0) + " min caminando" : "📍 Distancia no disponible"}</p>
-                <a class="btn"
-                   href="https://www.google.com/maps/dir/?api=1&origin=${userLat || ""},${userLon || ""}&destination=${l.lat},${l.lon}&travelmode=walking"
-                   target="_blank">Ir caminando</a>
-            </div>`;
-        }
-    });
-
-    if (lista.innerHTML === "") {
-        lista.innerHTML = `
-            <div class="card">
-                <p>😕 No hay sitios para mostrar.</p>
-            </div>`;
-    }
-}
-
-// Selectores
-const tipoSel = document.getElementById("tipo");
-const distanciaSel = document.getElementById("distancia");
-tipoSel.onchange = render;
-distanciaSel.onchange = render;
-
-// Inicializamos mapa centrado en Bagnolet si no hay GPS
-map = L.map('map').setView([48.8665, 2.4180], 15);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-render(); // Render inicial
-
-// PWA
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-}
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
