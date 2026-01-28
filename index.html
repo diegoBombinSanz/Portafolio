@@ -166,6 +166,7 @@ function render() {
     const distValue = distanciaSel.value; // 10, 25 o "all"
     lista.innerHTML = "";
 
+    // Elimina marcadores anteriores del mapa
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
@@ -173,21 +174,21 @@ function render() {
         let mostrar = false;
         let minutos = null;
 
-        // Si tenemos ubicación y no es "all"
+        // Si hay GPS y el filtro no es "all"
         if (userLat && userLon && distValue !== "all") {
             const km = distancia(userLat, userLon, l.lat, l.lon);
             minutos = km * 12; // tiempo caminando
             mostrar = minutos <= Number(distValue);
         } else {
-            // Siempre mostrar si no hay GPS o dist = "all"
+            // Siempre mostrar si no hay GPS o filtro "Mostrar todos"
             mostrar = true;
         }
 
         // Filtrar por tipo
         if (mostrar && (tipo === "all" || l.tipo === tipo)) {
 
-            // Añadir marcador al mapa si GPS disponible
-            if (map) {
+            // Agregar marcador solo si tenemos mapa y GPS
+            if (map && userLat && userLon) {
                 const m = L.marker([l.lat, l.lon])
                     .addTo(map)
                     .bindPopup(`${l.nombre}${minutos ? "<br>🚶 " + minutos.toFixed(0) + " min" : ""}`);
@@ -212,6 +213,7 @@ function render() {
             </div>`;
     }
 }
+
 
 
 function toggleNight() {
