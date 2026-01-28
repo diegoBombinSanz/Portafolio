@@ -12,6 +12,10 @@ body.night {
     --accent: #f39c12;
 }
 
+* {
+    box-sizing: border-box; /* IMPORTANTE: inputs y modal ajustados */
+}
+
 body {
     margin: 0;
     font-family: system-ui, sans-serif;
@@ -112,8 +116,10 @@ footer button {
     background: rgba(0,0,0,0.5);
 }
 
+/* Contenido modal */
 .modal-content {
     background: var(--card);
+    color: var(--text);
     margin: 10% auto;
     padding: 20px;
     border-radius: 12px;
@@ -121,23 +127,43 @@ footer button {
     max-width: 400px;
     position: relative;
     z-index: 10000; /* inputs encima del mapa */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
+/* Cerrar */
 .close {
     float: right;
     font-size: 1.5em;
     cursor: pointer;
 }
 
+/* Labels y inputs */
 label {
     display: block;
-    margin: 5px 0;
+    margin: 10px 0 5px;
+    font-weight: bold;
 }
 
 input, textarea, select {
     width: 100%;
-    padding: 5px;
+    padding: 8px;
     margin-top: 3px;
-    border-radius: 5px;
+    border-radius: 6px;
     border: 1px solid #ccc;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95em;
+}
+
+/* Botón modal enviar */
+.modal-content button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 1em;
 }
