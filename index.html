@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1f2a44">
 
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
@@ -96,7 +97,6 @@ button {
         <option value="10">⏱️ Hasta 10 min</option>
     </select>
 
-
     <button onclick="obtenerGPS()">📍 Recalcular</button>
     <button onclick="toggleNight()">🌙</button>
 </div>
@@ -104,6 +104,7 @@ button {
 <div id="map"></div>
 <div id="lista"></div>
 
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const lugares = [
@@ -120,18 +121,21 @@ let userLat = null;
 let userLon = null;
 let markers = [];
 
+function toggleNight() {
+    document.body.classList.toggle("night");
+}
+
 function distancia(lat1, lon1, lat2, lon2) {
-    const R = 6371;
+    const R = 6371; // km
     const dLat = (lat2-lat1) * Math.PI/180;
     const dLon = (lon2-lon1) * Math.PI/180;
-    const a =
-      Math.sin(dLat/2)**2 +
-      Math.cos(lat1*Math.PI/180) *
-      Math.cos(lat2*Math.PI/180) *
-      Math.sin(dLon/2)**2;
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+              Math.sin(dLon/2)**2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+// Función para obtener GPS al pulsar
 function obtenerGPS() {
     document.getElementById("gpsStatus").textContent = "📡 Localizando...";
     
@@ -157,16 +161,17 @@ function obtenerGPS() {
 
         render();
     }, () => {
-        document.getElementById("gpsStatus").textContent = "❌ No se pudo obtener ubicación";
+        document.getElementById("gpsStatus").textContent = "⚠️ Activa la ubicación y pulsa Recalcular";
+        render(); // Aun asi mostramos lista completa
     });
 }
 
+// Renderiza la lista de restaurantes
 function render() {
     const tipo = tipoSel.value;
     const distValue = distanciaSel.value; // 10, 25 o "all"
     lista.innerHTML = "";
 
-    // Elimina marcadores anteriores del mapa
     markers.forEach(m => map.removeLayer(m));
     markers = [];
 
@@ -174,20 +179,16 @@ function render() {
         let mostrar = false;
         let minutos = null;
 
-        // Si hay GPS y el filtro no es "all"
         if (userLat && userLon && distValue !== "all") {
             const km = distancia(userLat, userLon, l.lat, l.lon);
-            minutos = km * 12; // tiempo caminando
+            minutos = km * 12; // tiempo caminando aprox
             mostrar = minutos <= Number(distValue);
         } else {
-            // Siempre mostrar si no hay GPS o filtro "Mostrar todos"
             mostrar = true;
         }
 
-        // Filtrar por tipo
         if (mostrar && (tipo === "all" || l.tipo === tipo)) {
 
-            // Agregar marcador solo si tenemos mapa y GPS
             if (map && userLat && userLon) {
                 const m = L.marker([l.lat, l.lon])
                     .addTo(map)
@@ -214,18 +215,16 @@ function render() {
     }
 }
 
-
-
-function toggleNight() {
-    document.body.classList.toggle("night");
-}
-
+// Selectores
 const tipoSel = document.getElementById("tipo");
 const distanciaSel = document.getElementById("distancia");
-const lista = document.getElementById("lista");
-
 tipoSel.onchange = render;
 distanciaSel.onchange = render;
+
+// Inicializamos mapa centrado en Bagnolet si no hay GPS
+map = L.map('map').setView([48.8665, 2.4180], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+render(); // Render inicial
 
 // PWA
 if ("serviceWorker" in navigator) {
