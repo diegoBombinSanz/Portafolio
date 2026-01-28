@@ -57,7 +57,12 @@
             </select>
         </label>
         <label>Reseña:<br><textarea id="reseña" rows="3"></textarea></label>
-        <label>Ubicación (lat,lon): <input type="text" id="coordenadas" placeholder="48.8665,2.4180"></label>
+        <label>Buscar lugar:
+          <input type="text" id="buscadorLugar" placeholder="Escribe el nombre del lugar">
+        </label>
+        <p id="coordenadasSeleccionadas">Lat,Lon: —</p>
+        <input type="hidden" id="coordenadas">
+        <div id="sugerencias" class="sugerencias"></div>
         <button onclick="guardarLugar()">Enviar</button>
     </div>
 </div>
