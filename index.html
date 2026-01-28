@@ -8,7 +8,6 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1f2a44">
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
@@ -81,7 +80,7 @@ button {
 
 <header>
     <h2>🍽️ Guía Comer – Bagnolet</h2>
-    <p id="gpsStatus">📍 Localizando…</p>
+    <p id="gpsStatus">📍 Pulsa para localizarte</p>
 </header>
 
 <div class="controls">
@@ -96,6 +95,7 @@ button {
         <option value="10">⏱️ Hasta 10 min</option>
     </select>
 
+    <button onclick="obtenerGPS()">📍 Recalcular</button>
     <button onclick="toggleNight()">🌙</button>
 </div>
 
@@ -114,23 +114,9 @@ const lugares = [
 ];
 
 let map, userMarker;
-let userLat, userLon;
+let userLat = null;
+let userLon = null;
 let markers = [];
-
-function initMap(lat, lon) {
-    map = L.map('map').setView([lat, lon], 15);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    userMarker = L.marker([lat, lon])
-        .addTo(map)
-        .bindPopup("📍 Estás aquí")
-        .openPopup();
-
-    render();
-}
 
 function distancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
@@ -144,6 +130,35 @@ function distancia(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+function obtenerGPS() {
+    document.getElementById("gpsStatus").textContent = "📡 Localizando...";
+    
+    navigator.geolocation.getCurrentPosition(pos => {
+        userLat = pos.coords.latitude;
+        userLon = pos.coords.longitude;
+
+        document.getElementById("gpsStatus").textContent = "📍 Ubicación actualizada";
+
+        if (!map) {
+            map = L.map('map').setView([userLat, userLon], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+                .addTo(map);
+        } else {
+            map.setView([userLat, userLon], 15);
+        }
+
+        if (userMarker) map.removeLayer(userMarker);
+        userMarker = L.marker([userLat, userLon])
+            .addTo(map)
+            .bindPopup("📍 Estás aquí")
+            .openPopup();
+
+        render();
+    }, () => {
+        document.getElementById("gpsStatus").textContent = "❌ No se pudo obtener ubicación";
+    });
+}
+
 function render() {
     const tipo = tipoSel.value;
     const max = distanciaSel.value;
@@ -155,7 +170,7 @@ function render() {
     lugares.forEach(l => {
         const d = distancia(userLat, userLon, l.lat, l.lon);
 
-        if ((tipo === "all" || l.tipo === tipo) && d*60 <= max) {
+        if ((tipo === "all" || l.tipo === tipo) && d * 60 <= max) {
             const m = L.marker([l.lat, l.lon])
                 .addTo(map)
                 .bindPopup(`${l.nombre}<br>🚶 ${d.toFixed(2)} km`);
@@ -184,15 +199,6 @@ const lista = document.getElementById("lista");
 
 tipoSel.onchange = render;
 distanciaSel.onchange = render;
-
-navigator.geolocation.getCurrentPosition(pos => {
-    userLat = pos.coords.latitude;
-    userLon = pos.coords.longitude;
-    document.getElementById("gpsStatus").textContent = "📍 Ubicación detectada";
-    initMap(userLat, userLon);
-}, () => {
-    document.getElementById("gpsStatus").textContent = "⚠️ No se pudo obtener GPS";
-});
 
 // PWA
 if ("serviceWorker" in navigator) {
