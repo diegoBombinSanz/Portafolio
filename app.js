@@ -1,6 +1,6 @@
-/**********************
+/*************************
  * SUPABASE
- **********************/
+ *************************/
 const SUPABASE_URL = "https://qimdzrlchnxkarwisjut.supabase.co";
 const SUPABASE_KEY = "sb_publishable_51VQSvMMNVYE9p1c8VVheA_xTV9Mzj2";
 
@@ -9,24 +9,40 @@ const supabase = window.supabase.createClient(
   SUPABASE_KEY
 );
 
-/**********************
- * ESTADO GLOBAL
- **********************/
-let lugares = [];
-let userLocation = null;
-let markers = [];
+/*************************
+ * ESTADO
+ *************************/
 let map;
+let lugares = [];
+let markers = [];
+let userLocation = null;
 
-/**********************
- * MODO NOCHE
- **********************/
-function toggleNight() {
-  document.body.classList.toggle("night");
-}
+/*************************
+ * DOM READY (CLAVE)
+ *************************/
+document.addEventListener("DOMContentLoaded", () => {
 
-/**********************
+  // ===== MAPA =====
+  map = L.map("map").setView([48.864, 2.417], 14);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(map);
+
+  // ===== FILTROS =====
+  document.getElementById("filtroTipo").addEventListener("change", renderizar);
+  document.getElementById("filtroDistancia").addEventListener("change", renderizar);
+
+  // ===== AUTOCOMPLETE =====
+  initAutocomplete();
+
+  // ===== CARGAR DATOS =====
+  cargarLugares();
+});
+
+/*************************
  * MODAL
- **********************/
+ *************************/
 function abrirModal() {
   document.getElementById("modal").style.display = "block";
 }
@@ -35,14 +51,18 @@ function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-/**********************
- * GEOLOCALIZACIÓN (MANUAL)
- **********************/
+/*************************
+ * MODO NOCHE
+ *************************/
+function toggleNight() {
+  document.body.classList.toggle("night");
+}
+
+/*************************
+ * GEOLOCALIZACIÓN
+ *************************/
 function recalcular() {
-  if (!navigator.geolocation) {
-    alert("Geolocalización no soportada");
-    return;
-  }
+  if (!navigator.geolocation) return;
 
   navigator.geolocation.getCurrentPosition(
     pos => {
@@ -59,9 +79,9 @@ function recalcular() {
   );
 }
 
-/**********************
- * DISTANCIA (HAVERSINE)
- **********************/
+/*************************
+ * DISTANCIA
+ *************************/
 function distanciaKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -74,31 +94,68 @@ function distanciaKm(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/**********************
- * SUPABASE
- **********************/
-async function cargarLugares() {
-  const { data, error } = await supabase
-    .from("lugares")
-    .select("*");
+/*************************
+ * AUTOCOMPLETE (NOMINATIM)
+ *************************/
+function initAutocomplete() {
+  const input = document.getElementById("buscadorLugar");
+  const sugerencias = document.getElementById("sugerencias");
+  const coords = document.getElementById("coordenadas");
+  const texto = document.getElementById("coordsTexto");
 
+  let t;
+
+  input.addEventListener("input", () => {
+    const q = input.value.trim();
+    if (q.length < 3) {
+      sugerencias.innerHTML = "";
+      return;
+    }
+
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`
+      );
+      const data = await res.json();
+      sugerencias.innerHTML = "";
+
+      data.forEach(p => {
+        const div = document.createElement("div");
+        div.textContent = p.display_name;
+        div.onclick = () => {
+          coords.value = `${p.lat},${p.lon}`;
+          texto.textContent = `Lat,Lon: ${p.lat}, ${p.lon}`;
+          input.value = p.display_name;
+          sugerencias.innerHTML = "";
+        };
+        sugerencias.appendChild(div);
+      });
+    }, 300);
+  });
+}
+
+/*************************
+ * SUPABASE
+ *************************/
+async function cargarLugares() {
+  const { data, error } = await supabase.from("lugares").select("*");
   if (error) {
     console.error(error);
     return;
   }
-
   lugares = data;
   renderizar();
 }
 
 async function guardarLugar() {
-  const coordsInput = document.getElementById("coordenadas");
-  if (!coordsInput.value) {
-    alert("Selecciona un lugar válido");
+  const coords = document.getElementById("coordenadas").value;
+  if (!coords) {
+    alert("Selecciona un lugar");
     return;
   }
 
-  const [lat, lon] = coordsInput.value.split(",");
+  const [lat, lon] = coords.split(",");
 
   const lugar = {
     nombre: document.getElementById("buscadorLugar").value,
@@ -110,8 +167,8 @@ async function guardarLugar() {
 
   const { error } = await supabase.from("lugares").insert([lugar]);
   if (error) {
-    alert("Error al guardar");
     console.error(error);
+    alert("Error al guardar");
     return;
   }
 
@@ -119,9 +176,9 @@ async function guardarLugar() {
   cargarLugares();
 }
 
-/**********************
+/*************************
  * RENDER
- **********************/
+ *************************/
 function renderizar() {
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
@@ -130,20 +187,15 @@ function renderizar() {
   markers = [];
 
   const tipo = document.getElementById("filtroTipo").value;
-  const distanciaFiltro = document.getElementById("filtroDistancia").value;
+  const dist = document.getElementById("filtroDistancia").value;
 
   lugares.forEach(l => {
     if (tipo && l.tipo !== tipo) return;
 
-    if (distanciaFiltro !== "all" && userLocation) {
-      const d = distanciaKm(
-        userLocation.lat,
-        userLocation.lon,
-        l.lat,
-        l.lon
-      );
-      const minutos = (d / 5) * 60;
-      if (minutos > parseInt(distanciaFiltro)) return;
+    if (dist !== "all" && userLocation) {
+      const d = distanciaKm(userLocation.lat, userLocation.lon, l.lat, l.lon);
+      const min = (d / 5) * 60;
+      if (min > dist) return;
     }
 
     const card = document.createElement("div");
@@ -158,61 +210,6 @@ function renderizar() {
     `;
     lista.appendChild(card);
 
-    const marker = L.marker([l.lat, l.lon]).addTo(map);
-    markers.push(marker);
+    markers.push(L.marker([l.lat, l.lon]).addTo(map));
   });
-}
-
-/**********************
- * INIT (CLAVE)
- **********************/
-window.onload = () => {
-
-  // MAPA
-  map = L.map("map").setView([48.864, 2.417], 14);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap"
-  }).addTo(map);
-
-  // AUTOCOMPLETE
-  const inputBuscador = document.getElementById("buscadorLugar");
-  const sugerenciasDiv = document.getElementById("sugerencias");
-  const coordsInput = document.getElementById("coordenadas");
-  const coordsTexto = document.getElementById("coordsTexto");
-
-  let timeout;
-
-  inputBuscador.addEventListener("input", () => {
-    const q = inputBuscador.value.trim();
-    if (q.length < 3) {
-      sugerenciasDiv.innerHTML = "";
-      return;
-    }
-
-    clearTimeout(timeout);
-    timeout = setTimeout(async () => {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`
-      );
-      const data = await res.json();
-      sugerenciasDiv.innerHTML = "";
-
-      data.forEach(p => {
-        const div = document.createElement("div");
-        div.textContent = p.display_name;
-        div.onclick = () => {
-          coordsInput.value = `${p.lat},${p.lon}`;
-          coordsTexto.textContent = `Lat,Lon: ${p.lat}, ${p.lon}`;
-          inputBuscador.value = p.display_name;
-          sugerenciasDiv.innerHTML = "";
-        };
-        sugerenciasDiv.appendChild(div);
-      });
-    }, 300);
-  });
-
-  document.getElementById("filtroTipo").addEventListener("change", renderizar);
-  document.getElementById("filtroDistancia").addEventListener("change", renderizar);
-
-  cargarLugares();
-};
+      }
