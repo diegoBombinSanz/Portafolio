@@ -2,74 +2,66 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guía Comer – Bagnolet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía Bagnolet</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1f2a44">
+<link rel="stylesheet" href="style.css">
 
-<!-- CSS -->
-<link rel="stylesheet" href="style.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
 <body>
 
 <header>
-    <h2>🍽️ Guía Comer – Bagnolet</h2>
-    <p id="gpsStatus">📍 Pulsa para localizarte</p>
+  <h2>🍽️ Guía Bagnolet</h2>
 </header>
 
 <div class="controls">
-    <select id="tipo">
-        <option value="all">🍴 Todo</option>
-        <option value="comida">🥗 Comida</option>
-        <option value="cena">🌙 Cena</option>
-    </select>
-
-    <select id="distancia">
-        <option value="all">🌐 Mostrar todos</option>
-        <option value="25">🚶 Hasta 25 min</option>
-        <option value="10">⏱️ Hasta 10 min</option>
-    </select>
-
-    <button onclick="obtenerGPS()">📍 Recalcular</button>
-    <button onclick="toggleNight()">🌙</button>
+  <select id="filtroTipo">
+    <option value="">Todo</option>
+    <option value="comida">Comida</option>
+    <option value="cena">Cena</option>
+  </select>
 </div>
 
 <div id="map"></div>
+
 <div id="lista"></div>
 
 <footer>
-    <button onclick="mostrarFormulario()">➕ Añadir sitio recomendado</button>
+  <button onclick="abrirModal()">➕ Añadir sitio recomendado</button>
 </footer>
 
-<!-- Modal formulario -->
+<!-- MODAL -->
 <div id="modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarFormulario()">&times;</span>
-        <h3>Agregar lugar</h3>
-        <label>Nombre: <input type="text" id="nombreLugar"></label>
-        <label>Tipo: 
-            <select id="tipoLugar">
-                <option value="all">Todo</option>
-                <option value="comida">Comida</option>
-                <option value="cena">Cena</option>
-            </select>
-        </label>
-        <label>Reseña:<br><textarea id="reseña" rows="3"></textarea></label>
-        <label>Buscar lugar:
-          <input type="text" id="buscadorLugar" placeholder="Escribe el nombre del lugar">
-        </label>
-        <p id="coordenadasSeleccionadas">Lat,Lon: —</p>
-        <input type="hidden" id="coordenadas">
-        <div id="sugerencias" class="sugerencias"></div>
-        <button onclick="guardarLugar()">Enviar</button>
-    </div>
+  <div class="modal-content">
+    <span class="close" onclick="cerrarModal()">×</span>
+
+    <label>Nombre del lugar</label>
+    <input id="buscadorLugar" placeholder="Escribe el nombre">
+    <div id="sugerencias" class="sugerencias"></div>
+    <p id="coordsTexto">Lat,Lon: —</p>
+    <input type="hidden" id="coordenadas">
+
+    <label>Tipo</label>
+    <select id="tipoLugar">
+      <option value="comida">Comida</option>
+      <option value="cena">Cena</option>
+    </select>
+
+    <label>Reseña</label>
+    <textarea id="resenaLugar"></textarea>
+
+    <button onclick="guardarLugar()">Guardar</button>
+  </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="app.js"></script>
-
 </body>
 </html>
