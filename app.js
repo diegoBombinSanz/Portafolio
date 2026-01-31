@@ -18,14 +18,6 @@ let markers = [];
 let map;
 
 /**********************
- * MAPA
- **********************/
-map = L.map("map").setView([48.864, 2.417], 14);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap"
-}).addTo(map);
-
-/**********************
  * MODO NOCHE
  **********************/
 function toggleNight() {
@@ -42,45 +34,6 @@ function abrirModal() {
 function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
-
-/**********************
- * AUTOCOMPLETE (NOMINATIM)
- **********************/
-const inputBuscador = document.getElementById("buscadorLugar");
-const sugerenciasDiv = document.getElementById("sugerencias");
-const coordsInput = document.getElementById("coordenadas");
-const coordsTexto = document.getElementById("coordsTexto");
-
-let timeout;
-
-inputBuscador.addEventListener("input", () => {
-  const q = inputBuscador.value.trim();
-  if (q.length < 3) {
-    sugerenciasDiv.innerHTML = "";
-    return;
-  }
-
-  clearTimeout(timeout);
-  timeout = setTimeout(async () => {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`
-    );
-    const data = await res.json();
-    sugerenciasDiv.innerHTML = "";
-
-    data.forEach(p => {
-      const div = document.createElement("div");
-      div.textContent = p.display_name;
-      div.onclick = () => {
-        coordsInput.value = `${p.lat},${p.lon}`;
-        coordsTexto.textContent = `Lat,Lon: ${p.lat}, ${p.lon}`;
-        inputBuscador.value = p.display_name;
-        sugerenciasDiv.innerHTML = "";
-      };
-      sugerenciasDiv.appendChild(div);
-    });
-  }, 300);
-});
 
 /**********************
  * GEOLOCALIZACIÓN (MANUAL)
@@ -107,7 +60,7 @@ function recalcular() {
 }
 
 /**********************
- * DISTANCIA (Haversine)
+ * DISTANCIA (HAVERSINE)
  **********************/
 function distanciaKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -139,6 +92,7 @@ async function cargarLugares() {
 }
 
 async function guardarLugar() {
+  const coordsInput = document.getElementById("coordenadas");
   if (!coordsInput.value) {
     alert("Selecciona un lugar válido");
     return;
@@ -147,17 +101,14 @@ async function guardarLugar() {
   const [lat, lon] = coordsInput.value.split(",");
 
   const lugar = {
-    nombre: inputBuscador.value,
+    nombre: document.getElementById("buscadorLugar").value,
     tipo: document.getElementById("tipoLugar").value,
     resena: document.getElementById("resenaLugar").value,
     lat: parseFloat(lat),
     lon: parseFloat(lon)
   };
 
-  const { error } = await supabase
-    .from("lugares")
-    .insert([lugar]);
-
+  const { error } = await supabase.from("lugares").insert([lugar]);
   if (error) {
     alert("Error al guardar");
     console.error(error);
@@ -213,9 +164,55 @@ function renderizar() {
 }
 
 /**********************
- * INIT
+ * INIT (CLAVE)
  **********************/
-document.getElementById("filtroTipo").addEventListener("change", renderizar);
-document.getElementById("filtroDistancia").addEventListener("change", renderizar);
+window.onload = () => {
 
-window.onload = cargarLugares;
+  // MAPA
+  map = L.map("map").setView([48.864, 2.417], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(map);
+
+  // AUTOCOMPLETE
+  const inputBuscador = document.getElementById("buscadorLugar");
+  const sugerenciasDiv = document.getElementById("sugerencias");
+  const coordsInput = document.getElementById("coordenadas");
+  const coordsTexto = document.getElementById("coordsTexto");
+
+  let timeout;
+
+  inputBuscador.addEventListener("input", () => {
+    const q = inputBuscador.value.trim();
+    if (q.length < 3) {
+      sugerenciasDiv.innerHTML = "";
+      return;
+    }
+
+    clearTimeout(timeout);
+    timeout = setTimeout(async () => {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`
+      );
+      const data = await res.json();
+      sugerenciasDiv.innerHTML = "";
+
+      data.forEach(p => {
+        const div = document.createElement("div");
+        div.textContent = p.display_name;
+        div.onclick = () => {
+          coordsInput.value = `${p.lat},${p.lon}`;
+          coordsTexto.textContent = `Lat,Lon: ${p.lat}, ${p.lon}`;
+          inputBuscador.value = p.display_name;
+          sugerenciasDiv.innerHTML = "";
+        };
+        sugerenciasDiv.appendChild(div);
+      });
+    }, 300);
+  });
+
+  document.getElementById("filtroTipo").addEventListener("change", renderizar);
+  document.getElementById("filtroDistancia").addEventListener("change", renderizar);
+
+  cargarLugares();
+};
