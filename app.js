@@ -1,6 +1,6 @@
-// =======================
-// SUPABASE
-// =======================
+/**********************
+ * SUPABASE
+ **********************/
 const SUPABASE_URL = "https://qimdzrlchnxkarwisjut.supabase.co";
 const SUPABASE_KEY = "sb_publishable_51VQSvMMNVYE9p1c8VVheA_xTV9Mzj2";
 
@@ -9,20 +9,32 @@ const supabase = window.supabase.createClient(
   SUPABASE_KEY
 );
 
-// =======================
-// MAPA
-// =======================
-const map = L.map("map").setView([48.864, 2.417], 14);
+/**********************
+ * ESTADO GLOBAL
+ **********************/
+let lugares = [];
+let userLocation = null;
+let markers = [];
+let map;
+
+/**********************
+ * MAPA
+ **********************/
+map = L.map("map").setView([48.864, 2.417], 14);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "© OpenStreetMap"
 }).addTo(map);
 
-let markers = [];
-let lugares = [];
+/**********************
+ * MODO NOCHE
+ **********************/
+function toggleNight() {
+  document.body.classList.toggle("night");
+}
 
-// =======================
-// MODAL
-// =======================
+/**********************
+ * MODAL
+ **********************/
 function abrirModal() {
   document.getElementById("modal").style.display = "block";
 }
@@ -31,9 +43,9 @@ function cerrarModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-// =======================
-// AUTOCOMPLETE NOMINATIM
-// =======================
+/**********************
+ * AUTOCOMPLETE (NOMINATIM)
+ **********************/
 const inputBuscador = document.getElementById("buscadorLugar");
 const sugerenciasDiv = document.getElementById("sugerencias");
 const coordsInput = document.getElementById("coordenadas");
@@ -70,14 +82,52 @@ inputBuscador.addEventListener("input", () => {
   }, 300);
 });
 
-// =======================
-// SUPABASE CRUD
-// =======================
+/**********************
+ * GEOLOCALIZACIÓN (MANUAL)
+ **********************/
+function recalcular() {
+  if (!navigator.geolocation) {
+    alert("Geolocalización no soportada");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userLocation = {
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude
+      };
+      renderizar();
+    },
+    () => {
+      userLocation = null;
+      renderizar();
+    }
+  );
+}
+
+/**********************
+ * DISTANCIA (Haversine)
+ **********************/
+function distanciaKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**********************
+ * SUPABASE
+ **********************/
 async function cargarLugares() {
   const { data, error } = await supabase
     .from("lugares")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("*");
 
   if (error) {
     console.error(error);
@@ -104,7 +154,10 @@ async function guardarLugar() {
     lon: parseFloat(lon)
   };
 
-  const { error } = await supabase.from("lugares").insert([lugar]);
+  const { error } = await supabase
+    .from("lugares")
+    .insert([lugar]);
+
   if (error) {
     alert("Error al guardar");
     console.error(error);
@@ -115,39 +168,54 @@ async function guardarLugar() {
   cargarLugares();
 }
 
-// =======================
-// RENDER
-// =======================
+/**********************
+ * RENDER
+ **********************/
 function renderizar() {
-  document.getElementById("lista").innerHTML = "";
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
   markers.forEach(m => map.removeLayer(m));
   markers = [];
 
-  const filtro = document.getElementById("filtroTipo").value;
+  const tipo = document.getElementById("filtroTipo").value;
+  const distanciaFiltro = document.getElementById("filtroDistancia").value;
 
-  lugares
-    .filter(l => !filtro || l.tipo === filtro)
-    .forEach(l => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <strong>${l.nombre}</strong><br>
-        <span>${l.resena || ""}</span><br>
-        <a class="btn" target="_blank"
-          href="https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}">
-          🚶 Ruta caminando
-        </a>
-      `;
-      document.getElementById("lista").appendChild(card);
+  lugares.forEach(l => {
+    if (tipo && l.tipo !== tipo) return;
 
-      const m = L.marker([l.lat, l.lon]).addTo(map);
-      markers.push(m);
-    });
+    if (distanciaFiltro !== "all" && userLocation) {
+      const d = distanciaKm(
+        userLocation.lat,
+        userLocation.lon,
+        l.lat,
+        l.lon
+      );
+      const minutos = (d / 5) * 60;
+      if (minutos > parseInt(distanciaFiltro)) return;
+    }
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <strong>${l.nombre}</strong><br>
+      ${l.resena || ""}<br>
+      <a class="btn" target="_blank"
+        href="https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}">
+        🚶 Ruta caminando
+      </a>
+    `;
+    lista.appendChild(card);
+
+    const marker = L.marker([l.lat, l.lon]).addTo(map);
+    markers.push(marker);
+  });
 }
 
+/**********************
+ * INIT
+ **********************/
 document.getElementById("filtroTipo").addEventListener("change", renderizar);
+document.getElementById("filtroDistancia").addEventListener("change", renderizar);
 
-// =======================
-// INIT
-// =======================
 window.onload = cargarLugares;
