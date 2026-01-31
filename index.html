@@ -1,81 +1,117 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guía Campanile Bagnolet</title>
 
-<title>Guía Bagnolet</title>
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
-<link rel="stylesheet" href="style.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" />
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    /* fallback mínimo por si el css no carga */
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f4f4f4;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <h2>🍽️ Guía Bagnolet</h2>
-</header>
+  <!-- HEADER -->
+  <header class="header">
+    <h1>🍽️ Guía cerca del hotel</h1>
+    <button class="btn night-btn" onclick="toggleNight()">🌙</button>
+  </header>
 
-<!-- CONTROLES -->
-<div class="controls">
+  <!-- MAPA -->
+  <div id="map"></div>
 
-  <select id="filtroTipo">
-    <option value="">Todo</option>
-    <option value="comida">Comida</option>
-    <option value="cena">Cena</option>
-  </select>
-
-  <select id="filtroDistancia">
-    <option value="all">Sin cercanía</option>
-    <option value="5">≤ 5 min</option>
-    <option value="10">≤ 10 min</option>
-    <option value="25">≤ 25 min</option>
-  </select>
-
-  <button onclick="recalcular()">🔄 Recalcular</button>
-  <button onclick="toggleNight()">🌙</button>
-
-</div>
-
-<div id="map"></div>
-
-<div id="lista"></div>
-
-<footer>
-  <button onclick="abrirModal()">➕ Añadir sitio recomendado</button>
-</footer>
-
-<!-- MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="cerrarModal()">×</span>
-
-    <label>Buscar lugar</label>
-    <input id="buscadorLugar" placeholder="Nombre del sitio">
-    <div id="sugerencias" class="sugerencias"></div>
-    <p id="coordsTexto">Lat,Lon: —</p>
-    <input type="hidden" id="coordenadas">
-
-    <label>Tipo</label>
-    <select id="tipoLugar">
+  <!-- FILTROS -->
+  <section class="filters">
+    <select id="filtroTipo">
+      <option value="">Todo</option>
       <option value="comida">Comida</option>
       <option value="cena">Cena</option>
     </select>
 
-    <label>Reseña</label>
-    <textarea id="resenaLugar"></textarea>
+    <select id="filtroDistancia">
+      <option value="all">Sin cercanía</option>
+      <option value="10">10 min</option>
+      <option value="20">20 min</option>
+      <option value="25">25 min</option>
+    </select>
 
-    <button onclick="guardarLugar()">Guardar</button>
+    <button class="btn" onclick="recalcular()">📍 Recalcular</button>
+  </section>
+
+  <!-- LISTA -->
+  <main id="lista" class="lista"></main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <button class="btn primary" onclick="abrirModal()">
+      ➕ Añadir lugar recomendado
+    </button>
+  </footer>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+
+      <h2>Añadir lugar</h2>
+
+      <label>Buscar lugar</label>
+      <input
+        type="text"
+        id="buscadorLugar"
+        placeholder="Nombre del sitio"
+        autocomplete="off"
+      />
+      <div id="sugerencias" class="sugerencias"></div>
+
+      <label>Tipo</label>
+      <select id="tipoLugar">
+        <option value="comida">Comida</option>
+        <option value="cena">Cena</option>
+      </select>
+
+      <label>Reseña</label>
+      <textarea
+        id="resenaLugar"
+        placeholder="Breve reseña"
+      ></textarea>
+
+      <!-- Coordenadas ocultas -->
+      <input type="hidden" id="coordenadas" />
+      <div id="coordsTexto" class="coords"></div>
+
+      <div class="modal-actions">
+        <button class="btn primary" onclick="guardarLugar()">Guardar</button>
+        <button class="btn" onclick="cerrarModal()">Cancelar</button>
+      </div>
+
+    </div>
   </div>
-</div>
 
-<script src="app.js"></script>
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <!-- APP -->
+  <script src="app.js" defer></script>
+
 </body>
 </html>
