@@ -34,14 +34,15 @@ export default function ContactForm() {
   const onSubmit = async (data: any) => {
     setSending(true);
     try {
+      //Al cliente
       await emailjs.send(
-        "service_7tb34ei",   // <- Reemplaza con tu Service ID
-        "template_lwlzv5k",  // <- Reemplaza con tu Template ID
+        "service_7tb34ei",   
+        "template_lwlzv5k",  
         {
           ...data,
           //photos: uploadedPhotos.join("\n"), // fotos en string
         },
-        "RSZxKyDf96CM7wFq3"    // <- Reemplaza con tu Public Key
+        "RSZxKyDf96CM7wFq3"
       );
       toast.success("Formulario enviado correctamente");
       reset();

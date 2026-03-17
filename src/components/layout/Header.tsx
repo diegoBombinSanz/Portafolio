@@ -9,7 +9,6 @@ export default function Header() {
   const navItems = [
     { label: "Servicios", href: "#servicios" },
     { label: "Sobre mí", href: "#sobre-mi" },
-    { label: "Contacto", href: "#contacto" },
   ];
 
   return (
@@ -19,7 +18,7 @@ export default function Header() {
           {/* Logo/Name */}
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
-              <span className="text-white font-bold text-lg">JS</span>
+              <span className="text-white font-bold text-lg">DBS</span>
             </div>
             <span className="text-black font-bold text-xl tracking-tight hidden sm:block">
               Freelance Tech
