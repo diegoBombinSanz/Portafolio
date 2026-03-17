@@ -4,6 +4,7 @@ import About from "../components/sections/About.tsx"
 import Services from "../components/sections/Services.tsx"
 import Contact from "../components/sections/Contact.tsx"
 import Footer from "../components/layout/Footer.tsx"
+import HowItWorks from "../components/sections/HowItWorks.tsx"
 
 export default function Home() {
   return (
@@ -16,6 +17,8 @@ export default function Home() {
         <Hero />
 
         <Services />
+
+        <HowItWorks />
 
         <About />
 
