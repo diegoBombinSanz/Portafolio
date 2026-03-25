@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+﻿# DBS Freelance Tech (`tech-repair-site`)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sitio web tipo landing para un servicio freelance de soporte técnico, reparación y mantenimiento de equipos. La web está pensada para explicar qué se ofrece, cómo funciona el proceso y facilitar que el usuario solicite ayuda desde un formulario de contacto.
 
-Currently, two official plugins are available:
+## ¿En qué se centra?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Soporte técnico integral** (hardware + software) con foco en resolver problemas reales: equipos lentos, fallos de arranque, limpieza de virus, etc.
+- **Servicios claros y “sin jerga”**, con énfasis en rapidez, profesionalidad y transparencia.
+- **Captación de solicitudes** mediante un flujo simple: contar el problema → análisis → propuesta/presupuesto → solución.
 
-## React Compiler
+## Propósito
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Convertir visitas en solicitudes de servicio mostrando:
 
-## Expanding the ESLint configuration
+- Un mensaje principal (“Reparación Experta y Soluciones Tecnológicas a tu medida”).
+- Un catálogo breve de servicios (“Servicios Profesionales”).
+- Un proceso paso a paso (“Cómo funciona el servicio”).
+- Una sección “Sobre mí” (“Tecnología con un toque humano”).
+- Un punto de contacto central con CTA (“¿Tienes un problema? Hablemos.”).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Objetivos
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Presentar la marca (“DBS Freelance Tech / Freelance Tech”) y su propuesta de valor.
+- Explicar el tipo de trabajos y el enfoque (hardware, software, soporte, optimización).
+- Guiar al usuario hacia el contacto con CTAs (“Cuéntame tu problema”, “Solicitar Presupuesto”, “Solicitar revisión del equipo”).
+- Recoger la información mínima necesaria para preparar una solución/presupuesto.
+- Cumplir con páginas legales y enlaces desde el footer (Aviso legal, Privacidad, Cookies).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## ¿Qué muestra la web?
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Secciones (home `/`)
+
+- **Hero**: disponibilidad para nuevos proyectos + CTAs a `#contacto` y `#servicios`.
+- **Servicios**: tarjetas con servicios y ejemplos (p. ej. reparación de ordenadores, instalación de aplicaciones, mantenimiento preventivo).
+- **Cómo funciona**: 4 pasos (envío de solicitud → análisis → propuesta → solución).
+- **Sobre mí**: enfoque personal y transparente + garantía de satisfacción.
+- **Contacto**: modal/formulario para solicitar revisión del equipo y explicar el problema.
+
+### Páginas legales (rutas)
+
+- `/aviso-legal`: datos identificativos del titular, objeto, servicios, responsabilidad, propiedad intelectual y legislación aplicable (incluye el placeholder `[tudominio.com]`).
+- `/privacidad`: política de privacidad (responsable, datos recogidos, finalidad, bases legales, conservación, derechos, seguridad y normativa RGPD/LOPDGDD).
+- `/cookies`: política de cookies (información general, tipos de cookies, cookies utilizadas, gestión en navegadores y actualización de la política).
+
+## Formulario de contacto (en la UI)
+
+El flujo de contacto está orientado a recopilar datos del solicitante y del problema:
+
+- Datos de contacto: nombre, email, teléfono y método preferido (email / teléfono / WhatsApp).
+- Información del dispositivo: marca, modelo y sistema operativo.
+- Detalles del problema: descripción libre con ejemplo guiado.
+
+Además, la interfaz destaca “respuesta rápida”, “diagnóstico inicial gratuito” y “datos protegidos”, y muestra notificaciones de éxito/error al enviar.
+
+## Tecnologías
+
+- React + TypeScript + Vite
+- React Router (rutas y navegación a páginas legales)
+- Tailwind CSS (estilos)
+- `react-hook-form` (formulario), `sonner` (toasts), `lucide-react` (iconos)
+- EmailJS en el cliente para el envío del formulario
+
+## Desarrollo local
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Build y preview:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run preview
 ```
+
+## Descripción general (resumen)
+
+`tech-repair-site` es una landing SPA de “DBS Freelance Tech” orientada a soporte técnico freelance: presenta servicios de reparación y optimización (hardware/software), explica el proceso de trabajo y centraliza la conversión en un formulario de contacto, complementado con páginas legales (aviso legal, privacidad y cookies).
