@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -28,30 +29,27 @@ export default function Footer() {
             © {currentYear} DBS Freelance Tech. Todos los derechos reservados.
           </p>
           <div className="flex gap-6">
-            <a
-              href="#"
+            <Link
+              to="/aviso-legal"
               className="text-gray-400 text-xs hover:text-black transition-colors"
             >
-              Aviso Legal
-            </a>
-            <a
-              href="#"
+              Aviso legal
+            </Link>
+            <Link
+              to="/privacidad"
               className="text-gray-400 text-xs hover:text-black transition-colors"
             >
               Privacidad
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/cookies"
               className="text-gray-400 text-xs hover:text-black transition-colors"
             >
               Cookies
-            </a>
+            </Link>
           </div>
         </div>
       </div>
     </footer>
   );
 }
-
-
-
