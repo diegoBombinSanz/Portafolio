@@ -4,6 +4,7 @@ import AvisoLegal from "@/pages/aviso-legal/AvisoLegal.tsx";
 import Cookies from "@/pages/cookies/Cookies.tsx";
 import Privacidad from "@/pages/privacidad/Privacidad.tsx";
 import { Toaster } from "sonner";
+import WhatsAppButton from "@/components/elements/WhatsAppButton.tsx";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       </Routes>
 
       <Toaster />
+      <WhatsAppButton />
     </>
   );
 }
